@@ -14,8 +14,8 @@ class SimDriver:
     def reset(self):
         self.policy_network_.refresh()
         self.value_network_.refresh()
-        self.state_.reset()
-        self.tree_.reset()
+        self.state_ = GameState()
+        self.tree_ = SearchTreeHeader()
 
     def simulate(self):
         self.reset()

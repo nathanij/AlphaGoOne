@@ -89,8 +89,6 @@ class GameState:
         self.prev_states_.add(updated_board)
         return True
 
-
-
     def make_move(self, move):
         if move == self.size_ ** 2:
             self.pass_count_ += 1
