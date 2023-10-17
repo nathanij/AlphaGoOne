@@ -41,9 +41,9 @@ class SimDriver:
 
     def simulate(self):
         self.reset()
-        while not self.root_.finished():  # TODO: build
-            pre_state = self.root_.get_flattened_state()  # TODO: build
-            active_player = self.root_.get_active_player()  # TODO: build
+        while not self.root_.finished():
+            pre_state = self.root_.get_flattened_state()
+            active_player = self.root_.get_active_player()
             pre_state.append(active_player)
             self.training_states_.append(np.array(pre_state))
             search_driver = SearchDriver(self.policy_network_,
