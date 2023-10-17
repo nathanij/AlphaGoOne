@@ -1,6 +1,7 @@
 from copy import deepcopy
+from typing import List
 
-class GameState:
+class BoardState:
     def __init__(self, size = 19):
         self.size_ = size
         self.board_ = [[0] * size for _ in range(size)] # -1 for black, 1 for white
@@ -8,10 +9,16 @@ class GameState:
         self.active_ = 0 # black always starts
         self.pass_count_ = 0
 
-    def finished(self):
+    def finished(self) -> bool:
         return self.pass_count_ == 2
     
-    def get_active_player(self):
+    def get_flattened_state(self) -> List[int]:
+        flat_state = []
+        for row in self.board_:
+            flat_state += row
+        return flat_state
+    
+    def get_active_player(self) -> bool:
         return self.active_
     
     def get_player_state(self, active):

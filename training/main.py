@@ -5,8 +5,8 @@ from sim_driver import SimDriver
 run_iter = 0
 
 weight_path = os.path.join('networks', 'weights')
-policy_network_path = os.path.join(weight_path, 'policy')  # TODO: add file extension once known
-value_network_path = os.path.join(weight_path, 'value')
+policy_network_path = os.path.join(weight_path, 'policy.pt')
+value_network_path = os.path.join(weight_path, 'value.pt')
 
 input_arrays = []       # board state + turn
 value_tag_arrays = []   # game result

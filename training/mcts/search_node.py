@@ -1,9 +1,19 @@
-from typing import List, Optional, Type
+from typing import Optional, Type
+from board_state import BoardState
 
 
 class SearchNode:
-    def __init__(self, parent: Optional[Type['SearchNode']], state: List[List[int]]):
+    def __init__(self, parent: Optional[Type['SearchNode']], state: BoardState):
         self.parent_ = parent
         self.state_ = state
+        self.visits_ = 0
+        self.total_value_ = 0  # cumulative value score (not divided by visits)
+        # initial value will be the value networks eval, supplied by driver
         self.children_ = dict()
+
+    def child_at(self, move: int) -> Type['SearchNode']:
+        if move not in self.children_:
+            raise Exception("Board for requested move not found")
+        self.children_[move].parent_ = None
+        return self.children_[move]
 
