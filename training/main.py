@@ -13,7 +13,7 @@ value_tag_arrays = []   # game result
 policy_tag_arrays = []  # Normalized MCTS visit counts
 
 search_limit = 1600  # can adjust if sims taking too long
-expansion_factor = 361  # up to how many legal moves geenrated during MCTS, decreases as Policy strength increases
+expansion_factor = 362  # up to how many legal moves geenrated during MCTS, decreases as Policy strength increases
 sim_driver = SimDriver(policy_network_path, value_network_path,
                        search_limit, expansion_factor)
 sim_length = 2  # TODO: change to much larger once tested

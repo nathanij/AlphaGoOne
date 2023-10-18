@@ -1,4 +1,4 @@
-from typing import Optional, Type
+from typing import List, Optional, Tuple, Type
 from board_state import BoardState
 
 
@@ -12,29 +12,28 @@ class SearchNode:
         # initial value will be the value networks eval, supplied by driver
         self.children_ = dict()
 
-    def finished(self):
+    def finished(self) -> bool:
         return self.state_.finished()
     
-    def get_flattened_state(self):
+    def get_flattened_state(self) -> List[int]:
         return self.state_.get_flattened_state()
     
-    def get_active_player(self):
+    def get_active_player(self) -> bool:
         return self.state_.get_active_player()
     
-    def is_leaf(self):
+    def is_leaf(self) -> bool:
         return len(self.children_) == 0
     
     def add_visit(self):
         self.visits_ += 1
 
-    def children(self):
-        return self.children_
+    def branches(self) -> List[int]:
+        return self.children_.keys()
     
     def average_value(self):
         pass
 
-    def child_at(self, move: int) -> Type['SearchNode']:
+    def child_at(self, move: int) -> Tuple[float, Type['SearchNode']]:  # TODO: check if this typing is correct
         if move not in self.children_:
             raise Exception("Board for requested move not found")
-        self.children_[move].parent_ = None
         return self.children_[move]

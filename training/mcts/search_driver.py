@@ -26,12 +26,14 @@ class SearchDriver:
         cur = self.root_
         while not cur.is_leaf():
             cur.add_visit()
+            branches = cur.branches()
             if cur.get_active_player() == 0:  # black so maximize
                 max_value = -float('inf')
                 best_move = -1
-                for move, child in cur.children():
+                for move in branches:
+                    policy_score, child = cur.child_at(move)
                     q = child.average_value()  # TODO: build
-                    u = self.exploration_score(move)  # TODO: build
+                    u = self.exploration_score(move)  # TODO: build, also change interface for this probably
                     if q + u > max_value:
                         max_value = q + u
                         best_move = move
@@ -39,19 +41,18 @@ class SearchDriver:
             else:  # white so minimize
                 min_value = float('inf')
                 best_move = -1
-                for move, child in cur.children():
-                    q = child.average_value()  # TODO: build
-                    u = self.exploration_score(move)  # TODO: build
+                for move in branches:
+                    policy_score, child = cur.child_at(move)
+                    q = child.average_value()
+                    u = self.exploration_score(move)
                     if q + u < min_value:
                         min_value = q + u
                         best_move = move
                 cur = cur.traverse(best_move)
-
-        # once at lead node (including initial iteration)
-        # sort policy network results, generate board states for the top {expansion_factor} legal ones
-        # store in node.children_ as [(move, state)] pairing
-        # for each child, set visit count to 1, evaluate with value network (store natively in node)
-        # traverse up the tree back to the root
-        # at each node, refactor the nodes average value (unweighted average of children + self)
-        pass
+        
+        for move, strength, state in self.explore(cur):  # TODO: build (get sorted list of strengths, while len < limit check if legal and append triplet)
+            cur.add_child(move, strength, state)  # TODO: build
+        while cur != self.root_:
+            cur.reevaluate()  # TODO: build
+            cur = cur.ascend()  # TODO: build
     
