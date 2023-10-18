@@ -1,12 +1,15 @@
 from copy import deepcopy
+import random
 from typing import List
 
 class BoardState:
     def __init__(self, size = 19):
         self.size_ = size
         self.board_ = [[0] * size for _ in range(size)] # -1 for black, 1 for white
+        row, col = random.randint(0, 18), random.randint(0, 18)
+        self.board_[row][col] = 1  # randomized first move
         self.prev_states_ = set()
-        self.active_ = 0 # black always starts
+        self.active_ = 1 # white moves post-randomization
         self.pass_count_ = 0
 
     def finished(self) -> bool:
@@ -31,7 +34,7 @@ class BoardState:
                     row[i] = -row[i]
         return state
     
-    def bfs_(self, row, col, visited, prevs, match_color):
+    def bfs_(self, row, col, visited, prevs, match_color) -> bool:
         if row < 0 or col < 0 or row >= self.size_ or col >= self.size_:
             return False
         coord = (row, col)
@@ -55,7 +58,7 @@ class BoardState:
     # repeat BFS for moving player to check liberties if no captures are made
 
 
-    def validate_move_(self, row, col):
+    def validate_move_(self, row, col) -> bool:
         # check if space is already occupied
         if self.board_[row][col] != 0:
             return False
@@ -96,7 +99,7 @@ class BoardState:
         self.prev_states_.add(updated_board)
         return True
 
-    def make_move(self, move):
+    def make_move(self, move) -> bool:
         if move == self.size_ ** 2:
             self.pass_count_ += 1
             return True

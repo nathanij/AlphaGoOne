@@ -50,7 +50,7 @@ class SimDriver:
             search_driver = SearchDriver(self.policy_network_,
                                          self.value_network_, self.root_,
                                          self.search_limit_,
-                                         self.expansion_factor_, active_player)
+                                         self.expansion_factor_)
             while not search_driver.finished():
                 search_driver.expand()  # TODO: build
             move = search_driver.most_visited()  # TODO: build
