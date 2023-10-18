@@ -2,7 +2,7 @@ import os
 import numpy as np
 from sim_driver import SimDriver
 
-run_iter = 0
+run_iter = 0  # increment with each run to distinguish data
 
 weight_path = os.path.join('networks', 'weights')
 policy_network_path = os.path.join(weight_path, 'policy.pt')
@@ -12,7 +12,10 @@ input_arrays = []       # board state + turn
 value_tag_arrays = []   # game result
 policy_tag_arrays = []  # Normalized MCTS visit counts
 
-sim_driver = SimDriver(policy_network_path, value_network_path)
+search_limit = 1600  # can adjust if sims taking too long
+expansion_factor = 361  # up to how many legal moves geenrated during MCTS, decreases as Policy strength increases
+sim_driver = SimDriver(policy_network_path, value_network_path,
+                       search_limit, expansion_factor)
 sim_length = 2  # TODO: change to much larger once tested
 for _ in range(sim_length):
     sim_driver.simulate()

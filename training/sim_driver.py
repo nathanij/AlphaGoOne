@@ -9,11 +9,12 @@ from mcts.search_node import SearchNode
 
 class SimDriver:
     def __init__(self, policy_network_path: str, value_network_path: str,
-                 search_limit: int):
+                 search_limit: int, expansion_factor: int):
         self.policy_network_ = PolicyNetwork(policy_network_path)
         self.value_network_ = ValueNetwork(value_network_path)
         self.root_ = SearchNode(None, BoardState())
         self.search_limit_ = search_limit
+        self.expansion_factor_ = expansion_factor
         self.training_states_ = []
         self.visit_counts_ = []
 
@@ -48,7 +49,8 @@ class SimDriver:
             self.training_states_.append(np.array(pre_state))
             search_driver = SearchDriver(self.policy_network_,
                                          self.value_network_, self.root_,
-                                         self.search_limit_, active_player)
+                                         self.search_limit_,
+                                         self.expansion_factor_, active_player)
             while not search_driver.finished():
                 search_driver.expand()  # TODO: build
             move = search_driver.most_visited()  # TODO: build
