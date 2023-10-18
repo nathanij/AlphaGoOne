@@ -10,17 +10,22 @@ class SearchDriver:
     # vector will not include any)
     def __init__(self, policy_network: PolicyNetwork, 
                  value_network: ValueNetwork, root: SearchNode,
-                 search_limit: int, expansion_factor: int):
+                 exploration_factor: int, search_limit: int,
+                 expansion_limit: int):
         self.policy_network_ = policy_network
         self.value_network_ = value_network
         self.root_ = root
+        self.exploration_factor_ = exploration_factor
         self.iterations_ = 0
         self.search_limit_ = search_limit
-        self.expanison_factor_ = expansion_factor
+        self.expansion_limit_ = expansion_limit
 
 
     def finished(self):
         return self.iterations_ >= self.search_limit_
+    
+    def exploration_score(self, move: int, policy_score: float) -> float:
+        return 0
     
     def expand(self):
         cur = self.root_
@@ -29,29 +34,30 @@ class SearchDriver:
             branches = cur.branches()
             if cur.get_active_player() == 0:  # black so maximize
                 max_value = -float('inf')
-                best_move = -1
+                best_child = None
                 for move in branches:
                     policy_score, child = cur.child_at(move)
-                    q = child.average_value()  # TODO: build
-                    u = self.exploration_score(move)  # TODO: build, also change interface for this probably
+                    q = child.average_value()
+                    u = self.exploration_score(move, policy_score)  # TODO: build, also change interface for this probably
                     if q + u > max_value:
                         max_value = q + u
-                        best_move = move
-                cur = cur.traverse(best_move)  # TODO: build
+                        best_child = child
+                cur = best_child
             else:  # white so minimize
                 min_value = float('inf')
-                best_move = -1
+                best_child = None
                 for move in branches:
                     policy_score, child = cur.child_at(move)
                     q = child.average_value()
                     u = self.exploration_score(move)
                     if q + u < min_value:
                         min_value = q + u
-                        best_move = move
-                cur = cur.traverse(best_move)
+                        best_child = child
+                cur = best_child
         
         for move, strength, state in self.explore(cur):  # TODO: build (get sorted list of strengths, while len < limit check if legal and append triplet)
-            cur.add_child(move, strength, state)  # TODO: build
+            child = cur.add_child(move, strength, state)  # TODO: build (this should return the searchnode)
+            self.evaluate(child)  # TODO: build (evaluates new state and sets it within the searchnode)
         while cur != self.root_:
             cur.reevaluate()  # TODO: build
             cur = cur.ascend()  # TODO: build
