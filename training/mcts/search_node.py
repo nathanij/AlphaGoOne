@@ -3,12 +3,13 @@ from board_state import BoardState
 
 
 class SearchNode:
-    def __init__(self, parent: Optional[Type['SearchNode']], state: BoardState):
+    def __init__(self, parent: Optional[Type['SearchNode']], state: BoardState,
+                 policy_score: float):
         self.parent_ = parent
         self.state_ = state
         self.visits_ = 0
         self.value_ = 0  # determined by the value network, called when the node is made
-        self.policy_score_ = 0
+        self.policy_score_ = policy_score
         self.total_value_ = 0  # cumulative value score (not divided by visits)
         self.num_descendants_ = 0
         self.children_ = dict()

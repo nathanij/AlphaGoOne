@@ -14,9 +14,9 @@ policy_tag_arrays = []  # Normalized MCTS visit counts
 
 exploration_factor = 1  # TODO: research what a reasonable value for this is, and how it shifts
 search_limit = 1600  # can adjust if sims taking too long
-expansion_factor = 362  # up to how many legal moves generated during MCTS, can decrease as policy network strength increases
+expansion_limit = 362  # up to how many legal moves generated during MCTS, can decrease as policy network strength increases
 sim_driver = SimDriver(policy_network_path, value_network_path, 
-                       exploration_factor, search_limit, expansion_factor)
+                       exploration_factor, search_limit, expansion_limit)
 sim_length = 2  # TODO: change to much larger once tested
 for _ in range(sim_length):
     sim_driver.simulate()

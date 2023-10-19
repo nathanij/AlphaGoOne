@@ -13,7 +13,7 @@ class SimDriver:
                  expansion_limit: int):
         self.policy_network_ = PolicyNetwork(policy_network_path)
         self.value_network_ = ValueNetwork(value_network_path)
-        self.root_ = SearchNode(None, BoardState())
+        self.root_ = SearchNode(None, BoardState(), 0)
         self.exploration_factor_ = exploration_factor
         self.search_limit_ = search_limit
         self.expansion_limit_ = expansion_limit

@@ -36,9 +36,9 @@ class SearchDriver:
                 max_value = -float('inf')
                 best_child = None
                 for move in branches:
-                    policy_score, child = cur.child_at(move)
-                    q = child.average_value()
-                    u = self.exploration_score(move, policy_score)  # TODO: build, also change interface for this probably
+                    child = cur.child_at(move)
+                    q = child.average_value()  # TODO: redo with medium article
+                    u = self.exploration_score(child)  # TODO: build, also change interface for this probably
                     if q + u > max_value:
                         max_value = q + u
                         best_child = child
@@ -47,16 +47,16 @@ class SearchDriver:
                 min_value = float('inf')
                 best_child = None
                 for move in branches:
-                    policy_score, child = cur.child_at(move)
+                    child = cur.child_at(move)
                     q = child.average_value()
-                    u = self.exploration_score(move)
+                    u = self.exploration_score(child)
                     if q + u < min_value:
                         min_value = q + u
                         best_child = child
                 cur = best_child
         
         for move, strength, state in self.explore(cur):  # TODO: build (get sorted list of strengths, while len < limit check if legal and append triplet)
-            child = cur.add_child(move, strength, state)  # TODO: build (this should return the searchnode)
+            child = cur.add_child(move, strength, state)  # TODO: build (this should return the searchnode), store strength inside 
             self.evaluate(child)  # TODO: build (evaluates new state and sets it within the searchnode)
         while cur != self.root_:
             cur.reevaluate()  # TODO: build
