@@ -6,7 +6,8 @@ class BoardState:
     def __init__(self, size = 19):
         self.size_ = size
         self.board_ = [[0] * size for _ in range(size)] # -1 for black, 1 for white
-        row, col = random.randint(0, 18), random.randint(0, 18)
+        row, col = random.randint(0, 18), random.randint(0, 18) # TODO: should I randomize here, or just iterate all 361 possibilities, then retrain
+        # TODO: enquire about randmoziing beyond just the first move
         self.board_[row][col] = 1  # randomized first move
         self.prev_states_ = set()
         self.active_ = 1 # white moves post-randomization
@@ -23,16 +24,6 @@ class BoardState:
     
     def get_active_player(self) -> bool:
         return self.active_
-    
-    def get_player_state(self, active):
-        state = deepcopy(self.board_)
-        if active == 0:
-            return state
-        for row in state:
-            for i,x in enumerate(row):
-                if x != 0:
-                    row[i] = -row[i]
-        return state
     
     def bfs_(self, row, col, visited, prevs, match_color) -> bool:
         if row < 0 or col < 0 or row >= self.size_ or col >= self.size_:
@@ -110,7 +101,3 @@ class BoardState:
         self.pass_count_ = 0
         self.active_ = not self.active_
         return True
-
-    def display_board(self):
-        for row in self.board_:
-            print(row)

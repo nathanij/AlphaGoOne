@@ -1,4 +1,4 @@
-from typing import List, Optional, Tuple, Type
+from typing import List, Optional, Type
 from board_state import BoardState
 
 
@@ -25,6 +25,18 @@ class SearchNode:
     
     def is_leaf(self) -> bool:
         return len(self.children_) == 0
+    
+    def num_children(self) -> int:
+        return len(self.children_)
+    
+    def policy_score(self) -> float:
+        return self.policy_score_
+    
+    def visits(self) -> int:
+        return self.visits_
+    
+    def state(self) -> BoardState:
+        return self.state_
     
     def add_visit(self):
         self.visits_ += 1

@@ -1,3 +1,5 @@
+import math
+from typing import List, Tuple
 from mcts.search_node import SearchNode
 from networks.policy_network import PolicyNetwork
 from networks.value_network import ValueNetwork
@@ -24,8 +26,21 @@ class SearchDriver:
     def finished(self):
         return self.iterations_ >= self.search_limit_
     
-    def exploration_score(self, move: int, policy_score: float) -> float:
-        return 0
+    def exploration_score(self, parent: SearchNode, child: SearchNode) -> float:
+        scalar = self.exploration_factor_ * child.policy_score()
+        visit_score = math.sqrt(parent.visits() + parent.num_children()) / (1 + child.visits())
+        return scalar * visit_score
+    
+    def explore(self, cur: SearchNode) -> List[Tuple[float, int, SearchNode]]:  # TODO: check typing here
+        move_strengths = self.policy_network_.eval(cur)
+        i = 0
+        candidates = []
+        while i < len(move_strengths) and len(candidates) < self.expansion_limit_:
+            move = move_strengths[i][1]
+            result = cur.state().make_move(move)  # TODO: refactor to return None if failed, else a new Boardstate with the move made
+            if result is not None:
+                candidates.append(move_strengths[i][0], move, result)
+        return candidates
     
     def expand(self):
         cur = self.root_
@@ -37,8 +52,8 @@ class SearchDriver:
                 best_child = None
                 for move in branches:
                     child = cur.child_at(move)
-                    q = child.average_value()  # TODO: redo with medium article
-                    u = self.exploration_score(child)  # TODO: build, also change interface for this probably
+                    q = child.average_value()
+                    u = self.exploration_score(cur, child)
                     if q + u > max_value:
                         max_value = q + u
                         best_child = child
@@ -49,13 +64,13 @@ class SearchDriver:
                 for move in branches:
                     child = cur.child_at(move)
                     q = child.average_value()
-                    u = self.exploration_score(child)
+                    u = self.exploration_score(cur, child)
                     if q + u < min_value:
                         min_value = q + u
                         best_child = child
                 cur = best_child
         
-        for move, strength, state in self.explore(cur):  # TODO: build (get sorted list of strengths, while len < limit check if legal and append triplet)
+        for strength, move, state in self.explore(cur):  # TODO: build (get sorted list of strengths, while len < limit check if legal and append triplet)
             child = cur.add_child(move, strength, state)  # TODO: build (this should return the searchnode), store strength inside 
             self.evaluate(child)  # TODO: build (evaluates new state and sets it within the searchnode)
         while cur != self.root_:
