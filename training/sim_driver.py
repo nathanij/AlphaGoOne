@@ -1,26 +1,27 @@
 import numpy as np
 
-from typing import List
-
-from game_state import GameState
+from mcts.board_state import BoardState
 from mcts.search_driver import SearchDriver
-from mcts.search_tree_header import SearchTreeHeader
 from networks.value_network import ValueNetwork
 from networks.policy_network import PolicyNetwork
+from mcts.search_node import SearchNode
 
 
 class SimDriver:
     def __init__(self, policy_network_path: str, value_network_path: str,
-                 search_limit: int):
+                 exploration_factor: int, search_limit: int,
+                 expansion_limit: int):
         self.policy_network_ = PolicyNetwork(policy_network_path)
         self.value_network_ = ValueNetwork(value_network_path)
+        self.root_ = SearchNode(None, BoardState(), 0)
+        self.exploration_factor_ = exploration_factor
         self.search_limit_ = search_limit
-        self.game_state_ = GameState()
+        self.expansion_limit_ = expansion_limit
         self.training_states_ = []
         self.visit_counts_ = []
 
     def reset(self):
-        self.game_state_ = GameState()
+        self.root_ = SearchNode(None, BoardState())
         self.training_states_ = []
         self.visit_counts_ = []
 
@@ -28,22 +29,33 @@ class SimDriver:
         return np.vstack(self.training_states_)
     
     def result_tags(self) -> np.array:
-        val = self.game_state_.result()  # 1 for white win, 0.5 for draw, 0 for black win
+        val = self.root_.result()  # 1 for white win, 0.5 for draw, 0 for black win  TODO: build
         return np.full(len(self.training_states_), val)
     
     def policy_tags(self) -> np.ndarray:
         return np.vstack(self.visit_counts_)
+    
+    # Tree structuring:
+    # Root node passed into search_driver
+    # After the end of search, root is updated to the most visited child
+    # Root has a .finished() method, that is used instead of an exterior game state
+    # THis is accessible via the simulation driver
+    # It returns the new state object to be put into the generated leaf
 
     def simulate(self):
         self.reset()
-        tree = SearchTreeHeader()
-        while not self.game_state_.finished():
-            pre_state = self.game_state_.get_flattened_state()  # TODO: build
-            active_player = self.game_state_.get_active_player()
+        while not self.root_.finished():
+            pre_state = self.root_.get_flattened_state()
+            active_player = self.root_.get_active_player()
             pre_state.append(active_player)
-            self.training_states_.append(pre_state)
-            search_driver = SearchDriver(tree, self.search_limit_, active_player)
+            self.training_states_.append(np.array(pre_state))
+            search_driver = SearchDriver(self.policy_network_,
+                                         self.value_network_, self.root_,
+                                         self.exploration_factor_,
+                                         self.search_limit_,
+                                         self.expansion_limit_)
             while not search_driver.finished():
-                move = search_driver.expand()  # TODO: build
-                # continue move processing logic here
-            self.visit_counts_.append(search_driver.normalized_visit_count())  # TODO: build
+                search_driver.expand()
+            move = search_driver.most_visited()
+            self.visit_counts_.append(search_driver.normalized_visit_count())
+            self.root_ = self.root_.new_root_from(move)
