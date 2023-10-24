@@ -1,4 +1,6 @@
+import numpy as np
 import pytorch
+from mcts.board_state import BoardState
 
 class ValueNetwork:
     # Network evaluates the probability of a black win from the given situation
@@ -8,4 +10,8 @@ class ValueNetwork:
 
     def refresh(self):
         self.model_ = pytorch.load(self.address_)
+
+    def eval(self, state: BoardState) -> float:
+        position = state.get_flattened_state()
+        return self.network_.eval(np.array(position))
     

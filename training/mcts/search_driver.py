@@ -31,16 +31,20 @@ class SearchDriver:
         visit_score = math.sqrt(parent.visits() + parent.num_children()) / (1 + child.visits())
         return scalar * visit_score
     
-    def explore(self, cur: SearchNode) -> List[Tuple[float, int, SearchNode]]:  # TODO: check typing here
+    def explore(self, cur: SearchNode) -> List[Tuple[float, int, SearchNode]]:
         move_strengths = self.policy_network_.eval(cur)
         i = 0
         candidates = []
         while i < len(move_strengths) and len(candidates) < self.expansion_limit_:
             move = move_strengths[i][1]
-            result = cur.state().make_move(move)  # TODO: refactor to return None if failed, else a new Boardstate with the move made
+            result = cur.state().next_move(move)
             if result is not None:
                 candidates.append(move_strengths[i][0], move, result)
         return candidates
+    
+    def evaluate(self, child: SearchNode):
+        value = self.value_network_.eval(child.state())
+        child.set_value(value)
     
     def expand(self):
         cur = self.root_
@@ -70,10 +74,12 @@ class SearchDriver:
                         best_child = child
                 cur = best_child
         
-        for strength, move, state in self.explore(cur):  # TODO: build (get sorted list of strengths, while len < limit check if legal and append triplet)
-            child = cur.add_child(move, strength, state)  # TODO: build (this should return the searchnode), store strength inside 
-            self.evaluate(child)  # TODO: build (evaluates new state and sets it within the searchnode)
+        for strength, move, state in self.explore(cur):
+            child = cur.add_child(move, strength, state)
+            self.evaluate(child)
+        added_score, added_children = cur.reeval_leaf()
+        cur = cur.ascend()
         while cur != self.root_:
-            cur.reevaluate()  # TODO: build
-            cur = cur.ascend()  # TODO: build
+            cur.reevaluate(added_score, added_children)
+            cur = cur.ascend()
     

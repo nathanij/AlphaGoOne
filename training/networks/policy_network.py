@@ -11,9 +11,9 @@ class PolicyNetwork:
     def refresh(self):
         self.network_ = pytorch.load(self.weight_path_)
 
-    def eval(self, state: BoardState) -> List[Tuple[float, int]]:  # TODO: check again
+    def eval(self, state: BoardState) -> List[Tuple[float, int]]:
         position = state.get_flattened_state()
-        policy = self.network_.eval(np.array(position))  # TODO: check syntax here as well
+        policy = self.network_.eval(np.array(position))
         pairings = []
         for move, strength in enumerate(policy):
             pairings.append((strength, move))

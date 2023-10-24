@@ -1,17 +1,25 @@
 from copy import deepcopy
 import random
-from typing import List
+from typing import List, Optional, Type
 
 class BoardState:
-    def __init__(self, size = 19):
+    def __init__(self, size = 19, prev = None):
         self.size_ = size
-        self.board_ = [[0] * size for _ in range(size)] # -1 for black, 1 for white
-        row, col = random.randint(0, 18), random.randint(0, 18) # TODO: should I randomize here, or just iterate all 361 possibilities, then retrain
-        # TODO: enquire about randmoziing beyond just the first move
-        self.board_[row][col] = 1  # randomized first move
-        self.prev_states_ = set()
-        self.active_ = 1 # white moves post-randomization
-        self.pass_count_ = 0
+
+        if prev is not None:
+            self.board_ = prev.board_
+            self.prev_states_ = prev.prev_states_
+            self.active_ = prev.active_
+            self.pass_count_ = prev.pass_count_
+            
+        else:
+            row, col = random.randint(0, 18), random.randint(0, 18) # TODO: should I randomize here, or just iterate all 361 possibilities, then retrain
+            # TODO: enquire about randomizing beyond just the first move
+            self.board_ = [[0] * size for _ in range(size)] # -1 for black, 1 for white
+            self.board_[row][col] = 1  # randomized first move
+            self.prev_states_ = set()
+            self.active_ = 1 # white moves post-randomization
+            self.pass_count_ = 0
 
     def finished(self) -> bool:
         return self.pass_count_ == 2
@@ -89,6 +97,13 @@ class BoardState:
             return False
         self.prev_states_.add(updated_board)
         return True
+    
+    def next_move(self, move) -> Optional[Type['BoardState']]:
+        res = BoardState(self.size_, self)
+        flag = res.make_move(move)
+        if flag:
+            return res
+        return None
 
     def make_move(self, move) -> bool:
         if move == self.size_ ** 2:
