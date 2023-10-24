@@ -56,6 +56,6 @@ class SimDriver:
                                          self.expansion_limit_)
             while not search_driver.finished():
                 search_driver.expand()
-            move = search_driver.most_visited()  # TODO: build
-            self.root_ = self.root_.new_root_from(move)  # TODO: build
-            self.visit_counts_.append(search_driver.normalized_visit_count())  # TODO: build
+            move = search_driver.most_visited()
+            self.visit_counts_.append(search_driver.normalized_visit_count())
+            self.root_ = self.root_.new_root_from(move)

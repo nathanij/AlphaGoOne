@@ -82,4 +82,23 @@ class SearchDriver:
         while cur != self.root_:
             cur.reevaluate(added_score, added_children)
             cur = cur.ascend()
+
+    def most_visited(self) -> int:
+        max_visits = -1
+        max_move = -1
+        for move in self.root_.branches():
+            child = self.root_.child_at(move)
+            if child.visits() > max_visits:
+                max_visits = child.visits()
+                max_move = move
+        return max_move
     
+    def normalized_visit_count(self) -> List[float]:
+        visits = 0
+        target = [0] * 362
+        for move in self.root_.branches():
+            child = self.root_.child_at(move)
+            target[move] = child.visits()
+            visits += child.visits()
+        for i in range(len(target)):
+            target[i] /= visits

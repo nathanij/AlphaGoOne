@@ -48,8 +48,6 @@ class SearchNode:
         return (self.total_value_ + self.value_) / (self.num_descendants_ + 1)
 
     def child_at(self, move: int) -> Type['SearchNode']:
-        if move not in self.children_:
-            raise Exception("Board for requested move not found")
         return self.children_[move]
     
     def add_child(self, move: int, strength: float, state: BoardState):
@@ -79,3 +77,8 @@ class SearchNode:
         if self.parent_ is None:
             raise Exception("Non-root has no parent")
         return self.parent_
+    
+    def new_root_from(self, move: int) -> Type['SearchNode']:
+        new_root = self.child_at(move)
+        new_root.parent_ = None
+        return new_root
