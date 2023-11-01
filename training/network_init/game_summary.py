@@ -35,6 +35,7 @@ class GameSummary:
             return
         try:
             if self.game_.get_size() != 19:
+                print(f'Size: {self.game_.get_size()}')
                 self.winner_ = None
                 return
         except:
