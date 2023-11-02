@@ -24,7 +24,7 @@ for _ in range(sim_length):
     value_tag_arrays.append(sim_driver.result_tags())
     policy_tag_arrays.append(sim_driver.policy_tags())
 
-input_data = np.concatenate(input_arrays)
+input_data = np.concatenate(input_arrays) # TODO: check vstack and concat here
 value_tags = np.concatenate(value_tag_arrays)
 policy_tags = np.concatenate(policy_tag_arrays)
 

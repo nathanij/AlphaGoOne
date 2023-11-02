@@ -11,15 +11,15 @@ def display(board):
     for row in b:
         print(row)
 
-def flatten(board):
-    arr = [0] * 361
+def vectorize(board):
+    arr = [[0] * 19 for _ in range(19)]
     for row in range(19):
         for col in range(19):
             r = board.get(row, col)
             if r is not None:
                 stone = -1 if r == 'b' else 1
-                arr[19 * row + col] = stone
-    return arr
+                arr[row][col] = stone
+    return np.array(arr)
     
 
 
@@ -35,7 +35,6 @@ class GameSummary:
             return
         try:
             if self.game_.get_size() != 19:
-                print(f'Size: {self.game_.get_size()}')
                 self.winner_ = None
                 return
         except:
@@ -48,11 +47,9 @@ class GameSummary:
         board = boards.Board(19)
         self.states_ = []
         _, moves = sgf_moves.get_setup_and_moves(self.game_)
-        turn = 0
-        state = flatten(board)
-        state.append(turn)
-        state.append(self.winner_)
-        self.states_.append(np.asarray(state))
+        state = vectorize(board)
+        #state.append(turn)
+        self.states_.append((state, self.winner_))
         for color, coords in moves:
             try:
                 y, x = coords
@@ -60,14 +57,13 @@ class GameSummary:
             except:
                 self.winner_ = None
                 return
-            state = flatten(board)
-            state.append(turn)
-            state.append(self.winner_)
-            self.states_.append(np.asarray(state))
+            state = vectorize(board)
+            self.states_.append((state, self.winner_))
     
     def is_valid(self):
         return self.winner_ is not None
 
     def states_as_arrays(self):
         return self.states_
+    
             
